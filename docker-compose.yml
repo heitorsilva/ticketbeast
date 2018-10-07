@@ -1,0 +1,54 @@
+version: "3.7"
+services:
+  app:
+    build: .
+    image: ticketbeast/app
+    working_dir: /ticketbeast
+    tty: true
+    stdin_open: true
+    command: >
+      /bin/sh -c "
+        while ! nc -zv mysql 3306;
+        do
+          echo 'MySQL not ready' && sleep 5
+        done
+        if [ ! -f /ticketbeast/.env ]; then
+          cp /ticketbeast/.env.example /ticketbeast/.env;
+        fi
+        if [ ! -d /ticketbeast/vendor ]; then
+          composer install
+        fi
+        php artisan serve --host=0.0.0.0
+      "
+    volumes:
+      - .:/ticketbeast
+    ports:
+      - 8000:8000
+    networks:
+      - ticketbeastnet
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:8.0
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - ticketbeastnet
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: ticketbeast
+      MYSQL_PASSWORD: password
+    entrypoint: >
+      /bin/sh -c "
+        echo \"CREATE DATABASE IF NOT EXISTS ticketbeast;\nCREATE DATABASE IF NOT EXISTS ticketbeast_test;\nCREATE USER IF NOT EXISTS 'ticketbeast'@'%' IDENTIFIED BY 'password';GRANT ALL PRIVILEGES ON *.* TO 'ticketbeast'@'%';\" > /docker-entrypoint-initdb.d/init.sql;
+        /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE
+      "
+networks:
+  ticketbeastnet:
+    driver: "bridge"
+volumes:
+  mysqldata:
+    driver: "local"
