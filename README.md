@@ -1,4 +1,4 @@
-# TicketBeast
+# TicketBeast [![Build Status](https://travis-ci.com/heitorsilva/ticketbeast.svg?branch=master)](https://travis-ci.com/heitorsilva/ticketbeast)
 
 A platform for local concert promoters to sell tickets to their events.
 
