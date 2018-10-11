@@ -12,4 +12,8 @@ class Concert extends Model
     public function getFormattedDateAttribute() {
         return $this->date->format('F j, Y');
     }
+
+    public function getFormattedStartTimeAttribute() {
+        return $this->date->format('g:ia');
+    }
 }
