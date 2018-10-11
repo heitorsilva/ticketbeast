@@ -11,7 +11,7 @@ class ViewConcertListingTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testUserCanViewAConcertListing()
+    public function testUserCanViewAPublishedConcertListing()
     {
         $this->disableExceptionHandling();
 
@@ -25,7 +25,8 @@ class ViewConcertListingTest extends TestCase
             'city' => 'Laraville',
             'state' => 'ON',
             'zip' => '17916',
-            'additional_information' => 'For tickets, call (555) 555-5555.'
+            'additional_information' => 'For tickets, call (555) 555-5555.',
+            'published_at' => Carbon::parse('-1 week')
         ]);
 
         $response = $this->get('/concerts/'.$concert->id);
@@ -39,5 +40,16 @@ class ViewConcertListingTest extends TestCase
         $response->assertSee('123 Example Lane');
         $response->assertSee('Laraville, ON 17916');
         $response->assertSee('For tickets, call (555) 555-5555.');
+    }
+
+    public function testUserCannotViewUnpublishedConcertListings()
+    {
+        $concert = factory(Concert::class)->create([
+            'published_at' => null
+        ]);
+
+        $response = $this->get('/concerts/'.$concert->id);
+
+        $response->assertStatus(404);
     }
 }
