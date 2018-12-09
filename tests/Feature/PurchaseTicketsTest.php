@@ -15,6 +15,8 @@ class PurchaseTicketsTest extends TestCase
 
     public function testCustomerCanPurchaseConcertTickets()
     {
+        $this->withoutExceptionHandling();
+
         $paymentGateway = new FakePaymentGateway;
         $this->app->instance(PaymentGateway::class, $paymentGateway);
 
