@@ -11,6 +11,7 @@ test:
 	@docker-compose exec app ./vendor/bin/phpunit $(filter-out $@,$(MAKECMDGOALS))
 
 update:
-	@php artisan cache:clear
-	@php artisan clear-compiled
-	@composer update
+	@docker-compose exec app composer self-update
+	@docker-compose exec app php artisan cache:clear
+	@docker-compose exec app php artisan clear-compiled
+	@docker-compose exec app composer update -vvv
