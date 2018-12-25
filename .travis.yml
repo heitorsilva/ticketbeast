@@ -4,6 +4,9 @@ php:
   - 7.1
   - 7.2
 
+env:
+  - CODECOV_TOKEN="751a65e7-7962-454d-9080-697e0d8e4954"
+
 before_script:
   - cp .env.travis .env
   - composer self-update
@@ -14,7 +17,10 @@ before_script:
   - php artisan migrate
 
 script:
-  - vendor/bin/phpunit
+  - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 cache:
   directories:
